@@ -5,7 +5,7 @@ Sample project that integrates the [10Darts library](https://github.com/10darts/
 ## Index ##
 
 - [Requirements](#markdown-header-requirements)
-- [Integración del SDK](#markdown-header-sdk-integration-steps)
+- [SDK integration steps](#markdown-header-sdk-integration-steps)
 
 ## Requirements ##
 
@@ -14,7 +14,7 @@ Sample project that integrates the [10Darts library](https://github.com/10darts/
 
 ### SDK integration steps ###
 
-We have a [setup guide](https://docs.10darts.com/tutorials/android/setup.html) and a [guide for GCM](https://docs.10darts.com/faq/android/ gcm.html).
+We have a [setup guide](https://docs.10darts.com/tutorials/android/setup.html) and a [guide for GCM](https://docs.10darts.com/faq/android/gcm.html).
 
 However there is a section that is not entirely clear, it is necessary to create an app in the dashborad of 10 Darts:
 

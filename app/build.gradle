@@ -1,20 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.auroralabs.tendarts"
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        manifestPlaceholders = [
-                tendarts_sdk_access_token: "25dcac1511b6bf73a4274e3fed8899210916ee6a",
-                tendarts_sdk_client_class:"com.auroralabs.tendarts.MyTendartsClient",
-                gcm_sender_id: "664330177171"
-        ]
     }
     buildTypes {
         release {
@@ -25,18 +19,41 @@ android {
 
     flavorDimensions "default"
     productFlavors {
-        sdk {}
-        sdkTesting {}
+        sdk {
+            // 10darts account: arena@10darts.com
+            manifestPlaceholders = [
+                    tendarts_sdk_access_token: "291158dda3c109f1eff2e16ff81caedb03885f2a",
+                    tendarts_sdk_client_class:"com.auroralabs.tendarts.app.receivers.MyTendartsClient",
+                    gcm_sender_id: "664330177171"
+            ]
+        }
+        sdkTesting {
+            // 10darts account: francisco.soto@mmip.es
+            manifestPlaceholders = [
+                    tendarts_sdk_access_token: "25dcac1511b6bf73a4274e3fed8899210916ee6a",
+                    tendarts_sdk_client_class:"com.auroralabs.tendarts.app.receivers.MyTendartsClient",
+                    gcm_sender_id: "664330177171"
+            ]
+        }
     }
 }
 
+ext.androidSupportVersion = '27.0.2'
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
+
+    // Android Support
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "com.android.support:appcompat-v7:${androidSupportVersion}"
+    implementation "com.android.support:recyclerview-v7:${androidSupportVersion}"
+
+    // Butter Knife
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     // 10Darts module
     implementation project(path: ':sdk')

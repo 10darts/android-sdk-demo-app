@@ -1,8 +1,13 @@
-package com.auroralabs.tendarts;
+package com.auroralabs.tendarts.app.receivers;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.auroralabs.tendarts.BuildConfig;
+import com.auroralabs.tendarts.app.activities.MainActivity;
+import com.auroralabs.tendarts.domain.entities.LogEntity;
 import com.tendarts.sdk.client.TendartsClient;
 
 /**
@@ -45,6 +50,13 @@ public class MyTendartsClient extends TendartsClient {
 
     @Override
     public void logEvent(String category, String type, String message) {
+
+        // TODO: need context here
+
+        // Local broadcast to show log
+        Intent intent = new Intent(MainActivity.LOG_BROADCAST_INTENT_FILTER);
+        intent.putExtra(MainActivity.LOG_EXTRA, new LogEntity(category, type, message));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
         if (BuildConfig.DEBUG) {
 

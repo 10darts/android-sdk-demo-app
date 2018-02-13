@@ -8,6 +8,7 @@ import com.auroralabs.tendarts.R;
 import com.auroralabs.tendarts.domain.entities.LogEntity;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by luismacb on 12/2/18.
@@ -24,6 +25,8 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
 
     public LogViewHolder(View itemView) {
         super(itemView);
+
+        ButterKnife.bind(this, itemView);
     }
 
     public void bind(LogEntity logEntity) {
@@ -42,8 +45,8 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
             logEntity.setMessage("");
         }
 
-        String message = String.format("category: '%s', type: '%s', message: '%s'",
-                logEntity.getCategory(), logEntity.getType(), logEntity.getMessage());
+        String message = String.format("%s, category: '%s', type: '%s', message: '%s'",
+                logEntity.getLogDate(), logEntity.getCategory(), logEntity.getType(), logEntity.getMessage());
 
         logText.setText(message);
 

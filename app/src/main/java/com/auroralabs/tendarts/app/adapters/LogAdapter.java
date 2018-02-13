@@ -16,10 +16,16 @@ import java.util.List;
 
 public class LogAdapter extends RecyclerView.Adapter<LogViewHolder> {
 
-    List<LogEntity> list;
+    private List<LogEntity> list;
+    private LogAdapterInterface listener;
 
-    public LogAdapter(List<LogEntity> list) {
+    public LogAdapter(List<LogEntity> list, LogAdapterInterface listener) {
         this.list = list;
+        this.listener = listener;
+    }
+
+    public interface LogAdapterInterface {
+        void onLongClick();
     }
 
     @Override
@@ -32,6 +38,16 @@ public class LogAdapter extends RecyclerView.Adapter<LogViewHolder> {
     @Override
     public void onBindViewHolder(LogViewHolder holder, int position) {
         holder.bind(list.get(position));
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                if (listener != null) {
+                    listener.onLongClick();
+                }
+                return false;
+            }
+        });
     }
 
     @Override

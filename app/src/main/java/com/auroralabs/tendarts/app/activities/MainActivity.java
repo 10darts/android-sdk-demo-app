@@ -8,17 +8,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.auroralabs.tendarts.R;
 import com.auroralabs.tendarts.app.adapters.LogAdapter;
+import com.auroralabs.tendarts.app.fragments.SetUserDialogFragment;
 import com.auroralabs.tendarts.domain.entities.LogEntity;
 import com.tendarts.sdk.TendartsSDK;
 import com.tendarts.sdk.common.Configuration;
@@ -27,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,12 +51,16 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.android_version_text)
     TextView androidVersionText;
 
+    @BindView(R.id.link_device_with_user_button)
+    Button linkDeviceWithUserButton;
+
     @BindView(R.id.log_recycler_view)
     RecyclerView logRecyclerView;
 
     private LogAdapter logAdapter;
     private List<LogEntity> logEntityList = new ArrayList<>();
     private boolean shouldScrollToTop;
+    private String userName = "";
 
     private BroadcastReceiver logBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -75,16 +85,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void alertNotEnabled(Activity activity) {
 
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setTitle("Location");
-                alertDialog.setMessage("Location not enabled");
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
+                // Handler needed to fix error "sending message to a Handler on a dead thread"
+                Handler handler = new Handler(getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        showMessage("Location not enabled");
+
+                    }
+                });
+
 
             }
         });
@@ -102,8 +113,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Disable geolocation updates:
         //TendartsSDK.disableGeolocationUpdates();
-
-        //linkDeviceWithUserIdentifier();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
 
@@ -171,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void configureView() {
 
+        ButterKnife.bind(this);
+
         String accessToken = Configuration.getAccessToken(this);
         if (!TextUtils.isEmpty(accessToken)) {
             accessTokenText.setText(String.format("10darts SDK Access Token: %s", accessToken));
@@ -191,7 +202,12 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         logRecyclerView.setLayoutManager(linearLayoutManager);
 
-        logAdapter = new LogAdapter(logEntityList);
+        logAdapter = new LogAdapter(logEntityList, new LogAdapter.LogAdapterInterface() {
+            @Override
+            public void onLongClick() {
+                clearLog();
+            }
+        });
 
         logRecyclerView.setAdapter(logAdapter);
 
@@ -205,9 +221,17 @@ public class MainActivity extends AppCompatActivity {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 //check for scroll down
-                if(dy > 0) {
-                    shouldScrollToTop = false;
-                }
+
+                shouldScrollToTop = dy <= 0;
+
+            }
+        });
+
+        linkDeviceWithUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                askForUserName();
             }
         });
 
@@ -218,12 +242,53 @@ public class MainActivity extends AppCompatActivity {
         if (logEntity != null) {
 
             logEntityList.add(0, logEntity);
-            logAdapter.notifyDataSetChanged();
 
-            if (shouldScrollToTop) {
-                logRecyclerView.scrollToPosition(0);
-            }
+            Handler handler = new Handler(getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+
+                    logAdapter.notifyDataSetChanged();
+
+                    if (shouldScrollToTop) {
+                        logRecyclerView.scrollToPosition(0);
+                    }
+                }
+            });
         }
+
+    }
+
+    private void clearLog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Clear log?");
+        builder.setPositiveButton("Clear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                logEntityList.clear();
+                logAdapter.notifyDataSetChanged();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+
+    }
+
+    private void askForUserName() {
+
+        SetUserDialogFragment setUserDialogFragment = SetUserDialogFragment.newInstance(userName);
+        setUserDialogFragment.setListener(new SetUserDialogFragment.SetUserDialogListener() {
+            @Override
+            public void onUserNameSaved(String userName) {
+
+                if (!TextUtils.isEmpty(userName)) {
+                    linkDeviceWithUserIdentifier(userName);
+                }
+
+            }
+        });
+        setUserDialogFragment.show(getSupportFragmentManager(), "set_user_name");
 
     }
 
@@ -234,19 +299,38 @@ public class MainActivity extends AppCompatActivity {
      * 'From version 1.22, if this function fails, it will be automatically retried and when
      * succesfull your client class’s onUserLinkedToDevice function will be called'
      */
-    private void linkDeviceWithUserIdentifier() {
+    private void linkDeviceWithUserIdentifier(final String user) {
 
         TendartsSDK.linkDeviceWithUserIdentifier(new TendartsSDK.IResponseObserver() {
             @Override
             public void onOk() {
                 // Device linked, save it to not re-link again
+                MainActivity.this.userName = user;
+
+                showMessage("Device linked with user " + user);
             }
 
             @Override
             public void onFail(String errorString) {
                 // Something failed, try again later, more info on errorString
+                showMessage("Failed to link device with user " + user);
             }
-        },this,"my-user-identifier");
+        },this, user);
+
+    }
+
+    private void showMessage(String message) {
+
+        final Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+                message,
+                Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction("OK", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                snackbar.dismiss();
+            }
+        });
+        snackbar.show();
 
     }
 

@@ -17,12 +17,12 @@
         app:layout_constraintBottom_toTopOf="@+id/log_recycler_view">
 
         <TextView
-            android:id="@+id/main_text"
+            style="@style/InfoLine"
+            android:id="@+id/environment_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test pushes using 10Darts console"
-            android:layout_margin="10dp"
-            android:gravity="center"
+            tools:text="Base url: http://"
+            android:layout_marginTop="10dp"
             android:textStyle="bold" />
 
         <TextView

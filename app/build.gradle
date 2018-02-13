@@ -1,25 +1,38 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        // These docs use an open ended version so that our plugin
+        // can be updated quickly in response to Android tooling updates
+
+        // We recommend changing it to the latest version from our changelog:
+        // https://docs.fabric.io/android/changelog.html#fabric-gradle-plugin
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
 apply plugin: 'com.android.application'
+// Put Fabric plugin after Android plugin
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.auroralabs.tendarts"
+        applicationId "com.tendarts.demo"
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [FABRIC_API_KEY: "b77e95a05a27ebe68b3d01d4782f2eb09b0891c9"]
     }
     buildTypes {
-
-        debug {
-            // 10darts account: francisco.soto@mmip.es
-            manifestPlaceholders = [
-                    tendarts_sdk_access_token: "25dcac1511b6bf73a4274e3fed8899210916ee6a",
-                    tendarts_sdk_client_class:"com.auroralabs.tendarts.app.receivers.MyTendartsClient",
-                    gcm_sender_id: "664330177171"
-            ]
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -31,6 +44,16 @@ android {
                     gcm_sender_id: "664330177171"
             ]
         }
+
+        debug {
+            // 10darts account: francisco.soto@mmip.es
+            manifestPlaceholders = [
+                    tendarts_sdk_access_token: "25dcac1511b6bf73a4274e3fed8899210916ee6a",
+                    tendarts_sdk_client_class:"com.auroralabs.tendarts.app.receivers.MyTendartsClient",
+                    gcm_sender_id: "664330177171"
+            ]
+            applicationIdSuffix ".debug"
+        }
     }
 
     flavorDimensions "default"
@@ -40,6 +63,7 @@ android {
         }
         sdkTesting {
             // SDK points to staging server in this flavor
+            applicationIdSuffix ".staging"
         }
     }
 
@@ -47,6 +71,26 @@ android {
     // sdkTestingDebug == Staging | francisco.soto@mmip.es
     // sdkRelease == Production | arena@10darts.com
     // sdkTestingRelease == Staging | arena@10darts.com
+
+    // Set app name based on the build variant
+    applicationVariants.all { variant ->
+        def buildType = variant.buildType
+        def flavorName = variant.getFlavorName()
+
+        if (flavorName == 'sdk') {
+            if (buildType.name == 'debug') {
+                resValue "string", "app_name", "ß 10darts Production"
+            } else {
+                resValue "string", "app_name", "10darts Production"
+            }
+        } else {
+            if (buildType.name == 'debug') {
+                resValue "string", "app_name", "ß 10darts Staging"
+            } else {
+                resValue "string", "app_name", "10darts Staging"
+            }
+        }
+    }
 
 }
 
@@ -67,6 +111,11 @@ dependencies {
     // Butter Knife
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    // Crashlytics
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true;
+    }
 
     // 10Darts module
     implementation project(path: ':sdk')

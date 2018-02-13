@@ -25,19 +25,25 @@ import com.auroralabs.tendarts.R;
 import com.auroralabs.tendarts.app.adapters.LogAdapter;
 import com.auroralabs.tendarts.app.fragments.SetUserDialogFragment;
 import com.auroralabs.tendarts.domain.entities.LogEntity;
+import com.crashlytics.android.Crashlytics;
 import com.tendarts.sdk.TendartsSDK;
 import com.tendarts.sdk.common.Configuration;
+import com.tendarts.sdk.common.ConstantsBase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String LOG_EXTRA = "log_extra";
     public static final String LOG_BROADCAST_INTENT_FILTER = "log_broadcast_intent_filter";
+
+    @BindView(R.id.environment_text)
+    TextView environmentText;
 
     @BindView(R.id.access_token_text)
     TextView accessTokenText;
@@ -75,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.activity_main);
 
@@ -181,6 +189,9 @@ public class MainActivity extends AppCompatActivity {
     private void configureView() {
 
         ButterKnife.bind(this);
+
+        String environment = String.format("Server base URL: %s", ConstantsBase.baseUrl);
+        environmentText.setText(environment);
 
         String accessToken = Configuration.getAccessToken(this);
         if (!TextUtils.isEmpty(accessToken)) {
@@ -356,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Current Android version data
-    public static String currentAndroidVersion(){
+    public static String currentAndroidVersion() {
         double release = Double.parseDouble(Build.VERSION.RELEASE.replaceAll("(\\d+[.]\\d+)(.*)","$1"));
         String codeName = "Unsupported";//below Jelly bean OR above Oreo
         if(release >= 4.1 && release < 4.4) {

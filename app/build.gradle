@@ -21,6 +21,10 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
 
+def certDataFile = rootProject.file('certs/release/cert_release.properties')
+def certData = new Properties()
+certData.load(new FileInputStream(certDataFile))
+
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -32,6 +36,16 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [FABRIC_API_KEY: "b77e95a05a27ebe68b3d01d4782f2eb09b0891c9"]
     }
+
+    signingConfigs {
+        release {
+            storeFile file("../certs/release/cert_release.keystore")
+            storePassword certData['storePassword']
+            keyAlias certData['keyAlias']
+            keyPassword certData['keyPassword']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -43,6 +57,7 @@ android {
                     tendarts_sdk_client_class:"com.auroralabs.tendarts.app.receivers.MyTendartsClient",
                     gcm_sender_id: "664330177171"
             ]
+            signingConfig signingConfigs.release
         }
 
         debug {

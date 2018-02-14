@@ -1,42 +1,122 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        // These docs use an open ended version so that our plugin
+        // can be updated quickly in response to Android tooling updates
+
+        // We recommend changing it to the latest version from our changelog:
+        // https://docs.fabric.io/android/changelog.html#fabric-gradle-plugin
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
 apply plugin: 'com.android.application'
+// Put Fabric plugin after Android plugin
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
-        applicationId "com.auroralabs.tendarts"
+        applicationId "com.tendarts.demo"
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        manifestPlaceholders = [
-                tendarts_sdk_access_token: "25dcac1511b6bf73a4274e3fed8899210916ee6a",
-                tendarts_sdk_client_class:"com.auroralabs.tendarts.MyTendartsClient",
-                gcm_sender_id: "664330177171"
-        ]
+        manifestPlaceholders = [FABRIC_API_KEY: "b77e95a05a27ebe68b3d01d4782f2eb09b0891c9"]
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            // 10darts account: arena@10darts.com
+            manifestPlaceholders = [
+                    tendarts_sdk_access_token: "291158dda3c109f1eff2e16ff81caedb03885f2a",
+                    tendarts_sdk_client_class:"com.auroralabs.tendarts.app.receivers.MyTendartsClient",
+                    gcm_sender_id: "664330177171"
+            ]
+        }
+
+        debug {
+            // 10darts account: francisco.soto@mmip.es
+            manifestPlaceholders = [
+                    tendarts_sdk_access_token: "25dcac1511b6bf73a4274e3fed8899210916ee6a",
+                    tendarts_sdk_client_class:"com.auroralabs.tendarts.app.receivers.MyTendartsClient",
+                    gcm_sender_id: "664330177171"
+            ]
+            applicationIdSuffix ".debug"
         }
     }
 
     flavorDimensions "default"
     productFlavors {
-        sdk {}
-        sdkTesting {}
+        sdk {
+            // SDK points to production server in this flavor
+        }
+        sdkTesting {
+            // SDK points to staging server in this flavor
+            applicationIdSuffix ".staging"
+        }
     }
+
+    // sdkDebug == Production | francisco.soto@mmip.es
+    // sdkTestingDebug == Staging | francisco.soto@mmip.es
+    // sdkRelease == Production | arena@10darts.com
+    // sdkTestingRelease == Staging | arena@10darts.com
+
+    // Set app name based on the build variant
+    applicationVariants.all { variant ->
+        def buildType = variant.buildType
+        def flavorName = variant.getFlavorName()
+
+        if (flavorName == 'sdk') {
+            if (buildType.name == 'debug') {
+                resValue "string", "app_name", "ß 10darts Production"
+            } else {
+                resValue "string", "app_name", "10darts Production"
+            }
+        } else {
+            if (buildType.name == 'debug') {
+                resValue "string", "app_name", "ß 10darts Staging"
+            } else {
+                resValue "string", "app_name", "10darts Staging"
+            }
+        }
+    }
+
 }
+
+ext.androidSupportVersion = '27.0.2'
+ext.butterKnifeVersion = '8.8.1'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
+
+    // Android Support
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "com.android.support:appcompat-v7:${androidSupportVersion}"
+    implementation "com.android.support:recyclerview-v7:${androidSupportVersion}"
+    implementation "com.android.support:design:${androidSupportVersion}"
+
+    // Butter Knife
+    implementation "com.jakewharton:butterknife:${butterKnifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+
+    // Crashlytics
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true;
+    }
 
     // 10Darts module
     implementation project(path: ':sdk')

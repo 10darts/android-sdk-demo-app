@@ -1,6 +1,7 @@
 package com.auroralabs.tendarts.app.viewholders;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -33,22 +34,28 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
 
         this.logEntity = logEntity;
 
-        if (logEntity.getCategory() == null) {
-            logEntity.setCategory("");
+        StringBuilder message = new StringBuilder();
+        message.append(logEntity.getLogDate());
+
+        if (!TextUtils.isEmpty(logEntity.getCategory())) {
+            message.append(", category: '");
+            message.append(logEntity.getCategory());
+            message.append("'");
         }
 
-        if (logEntity.getType() == null) {
-            logEntity.setType("");
+        if (!TextUtils.isEmpty(logEntity.getType())) {
+            message.append(", type: '");
+            message.append(logEntity.getType());
+            message.append("'");
         }
 
-        if (logEntity.getMessage() == null) {
-            logEntity.setMessage("");
+        if (!TextUtils.isEmpty(logEntity.getMessage())) {
+            message.append(", message: '");
+            message.append(logEntity.getMessage());
+            message.append("'");
         }
 
-        String message = String.format("%s, category: '%s', type: '%s', message: '%s'",
-                logEntity.getLogDate(), logEntity.getCategory(), logEntity.getType(), logEntity.getMessage());
-
-        logText.setText(message);
+        logText.setText(message.toString());
 
     }
 

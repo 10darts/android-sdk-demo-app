@@ -3,6 +3,7 @@ package com.auroralabs.tendarts.app.receivers;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -70,7 +71,27 @@ public class MyTendartsClient extends TendartsClient {
 
         if (BuildConfig.DEBUG) {
 
-            Log.d(LOG_TAG, "category: '" + category + "', type: '" + type + "', message: '" + message + "'");
+            StringBuilder logBuilder = new StringBuilder();
+
+            if (!TextUtils.isEmpty(category)) {
+                logBuilder.append(", category: '");
+                logBuilder.append(category);
+                logBuilder.append("'");
+            }
+
+            if (!TextUtils.isEmpty(type)) {
+                logBuilder.append(", type: '");
+                logBuilder.append(type);
+                logBuilder.append("'");
+            }
+
+            if (!TextUtils.isEmpty(message)) {
+                logBuilder.append(", message: '");
+                logBuilder.append(message);
+                logBuilder.append("'");
+            }
+
+            Log.d(LOG_TAG, logBuilder.toString());
 
         }
 

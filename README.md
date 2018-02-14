@@ -4,10 +4,10 @@ Sample project that integrates the [10Darts library](https://github.com/10darts/
 
 ## Index ##
 
-- [Requirements](#markdown-header-requirements)
-- [Build variants](#markdown-header-build-variants)
-- [Building considerations](#markdown-header-building-considerations)
-- [SDK integration steps](#markdown-header-sdk-integration-steps)
+- [Requirements](#requirements)
+- [Build variants](#build-variants)
+- [Building considerations](#building-considerations)
+- [SDK integration steps](#sdk-integration-steps)
 
 ## Requirements ##
 
@@ -46,7 +46,7 @@ keyAlias=<replace with data>
 keyPassword=<replace with data>
 ```
 
-### SDK integration steps ###
+## SDK integration steps ##
 
 We have a [setup guide](https://docs.10darts.com/tutorials/android/setup.html) and a [guide for GCM](https://docs.10darts.com/faq/android/gcm.html).
 

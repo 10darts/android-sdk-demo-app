@@ -6,6 +6,7 @@ Sample project that integrates the [10Darts library](https://github.com/10darts/
 
 - [Requirements](#markdown-header-requirements)
 - [Build variants](#markdown-header-build-variants)
+- [Building considerations](#markdown-header-building-considerations)
 - [SDK integration steps](#markdown-header-sdk-integration-steps)
 
 ## Requirements ##
@@ -33,6 +34,17 @@ The project has been set up with 4 Gradle build variants:
   - Server: staging
   - 10darts account: arena@10darts.com
   - App name: 10darts Staging
+
+## Building considerations ##
+
+When compiling for **Release** build variants a signing config will be required. The project is set to pick the kestore credentials from a file in [certs/release/cert_release.properties](certs/release/cert_release.properties).
+That file won't be uploaded to the repo, so if you don't have it, you can create it with the content:
+
+```
+storePassword=<replace with data>
+keyAlias=<replace with data>
+keyPassword=<replace with data>
+```
 
 ### SDK integration steps ###
 

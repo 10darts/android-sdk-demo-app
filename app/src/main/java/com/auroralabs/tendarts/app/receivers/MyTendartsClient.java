@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.auroralabs.tendarts.BuildConfig;
 import com.auroralabs.tendarts.app.activities.MainActivity;
 import com.auroralabs.tendarts.domain.entities.LogEntity;
+import com.tendarts.sdk.Model.Notification;
 import com.tendarts.sdk.client.TendartsClient;
 
 import java.lang.ref.WeakReference;
@@ -96,4 +97,13 @@ public class MyTendartsClient extends TendartsClient {
         }
 
     }
+
+    @Override
+    public boolean onNotificationReceived(Notification notification) {
+
+        // Notification is received on the device
+
+        return false;
+    }
+
 }

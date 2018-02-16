@@ -109,8 +109,10 @@ android {
 
 }
 
-ext.androidSupportVersion = '27.0.2'
-ext.butterKnifeVersion = '8.8.1'
+ext {
+    androidSupportVersion = '27.0.2'
+    butterKnifeVersion = '8.8.1'
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

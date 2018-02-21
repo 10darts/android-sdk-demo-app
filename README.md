@@ -46,6 +46,14 @@ keyAlias=<replace with data>
 keyPassword=<replace with data>
 ```
 
+For the Maven deployer tasks credentials are needed. The project is set to pick them from a file in [sdk/credentials.properties](sdk/credentials.properties).
+That file won't be uploaded to the repo, so if you don't have it, you can create it with the content:
+
+```
+NEXUS_USERNAME=<replace with data>
+NEXUS_PASSWORD=<replace with data>
+```
+
 ## SDK integration steps ##
 
 We have a [setup guide](https://docs.10darts.com/tutorials/android/setup.html) and a [guide for GCM](https://docs.10darts.com/faq/android/gcm.html).

@@ -48,3 +48,6 @@ Gemfile.lock
 
 # Cert info
 cert_release.properties
+
+# Maven credentials info
+credentials.properties

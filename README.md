@@ -52,6 +52,14 @@ That file won't be uploaded to the repo, so if you don't have it, you can create
 ```
 NEXUS_USERNAME=<replace with data>
 NEXUS_PASSWORD=<replace with data>
+
+bintray.user=<replace with data>
+bintray.apikey=<replace with data>
+bintray.gpg.password=<replace with data>
+
+signing.keyId=<replace with data>
+signing.password=<replace with data>
+signing.secretKeyRingFile=<replace with data>
 ```
 
 ## SDK integration steps ##

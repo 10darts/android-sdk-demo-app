@@ -107,6 +107,11 @@ android {
         }
     }
 
+    configurations.all {
+        // Check for updates every build
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
 }
 
 ext {
@@ -139,8 +144,8 @@ dependencies {
     implementation project(path: ':sdk')
 
     // Pick library from production
-//    implementation  ('com.10darts:sdk:1.25') {
-//        exclude module: 'httpclient'
+//    implementation  ('com.10darts:sdk:1.25.1') {
+//        changing = true // Forces library to be re-downloaded every time
 //    }
 
 }

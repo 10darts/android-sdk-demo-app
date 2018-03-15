@@ -124,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
 
+        // Test association of key-value to device
+        // TODO: luisma: call TendartsSDK methods
+
     }
 
     @Override

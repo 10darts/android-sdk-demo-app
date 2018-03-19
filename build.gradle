@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = 'com.10darts'
     PUBLISH_ARTIFACT_ID = 'sdk'
-    PUBLISH_VERSION = '1.23'
+    PUBLISH_VERSION = '1.25.1'
 
 
     bintrayRepo = '10darts'
@@ -16,26 +16,44 @@ ext {
     libraryDescription = '10 Darts Android SDK'
 
     siteUrl = 'https://10darts.com/'
-    gitUrl = 'https://github.com/onpublico/android-sdk'
+    gitUrl = 'https://github.com/10darts/android-TendartsSDK'
 
     libraryVersion = PUBLISH_VERSION
 
-    developerId = '10Darts'
-    developerName = 'Jorge Arimany'
-    developerEmail = 'jorge@onpublico.com'
+    developerId = '10darts'
+    developerName = '10darts'
+    developerEmail = 'marcos@10darts.com'
+    organization = '10darts'
 
     licenseName = 'MIT License'
-    licenseUrl = 'https://github.com/onpublico/android-sdk/blob/master/license.txt'
+    licenseUrl = 'https://github.com/10darts/android-TendartsSDK/blob/master/LICENSE'
     allLicenses = ["MIT"]
 }
 
+def propertiesFile = rootProject.file('sdk/credentials.properties')
+def propertiesData = new Properties()
+propertiesData.load(new FileInputStream(propertiesFile))
+
+ext.bintrayUser=propertiesData['bintray.user']
+ext.bintrayApiKey=propertiesData['bintray.apikey']
+ext.bintrayGpgPassword=propertiesData['bintray.gpg.password']
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+    }
+}
+
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.3'
+    compileSdkVersion 27
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName PUBLISH_VERSION
 
@@ -89,35 +107,38 @@ android {
     useLibrary 'org.apache.http.legacy'
 }
 
+ext {
+    playServicesVersion = '11.8.0'
+    androidSupportVersion = '27.0.2'
+}
+
+configurations.all {
+    resolutionStrategy.force "com.android.support:support-v4:${androidSupportVersion}"
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+    testImplementation 'junit:junit:4.12'
+
+    // Android Support
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
     // Play Services
-    implementation ('com.google.android.gms:play-services-gcm:11.8.0'){ transitive = true }
-    implementation 'com.google.android.gms:play-services-location:11.8.0'
-
-    testImplementation 'junit:junit:4.12'
+    implementation ("com.google.android.gms:play-services-gcm:${playServicesVersion}") { transitive = true }
+    implementation "com.google.android.gms:play-services-location:${playServicesVersion}"
 
     implementation 'org.apache.httpcomponents:httpclient-android:4.3.5'
     implementation ('org.apache.httpcomponents:httpmime:4.3.5') {
         exclude module: 'httpclient'
     }
 
-    //exclude module:'Onpublico','common','glass','mobile','wear'
-
-    //compile project(path: ':general')
 }
 
+// Scripts to make uploading to bintray easy (https://github.com/quangctkm9207/template-files/tree/master/android/gradle)
+apply from: 'https://raw.githubusercontent.com/quangctkm9207/template-files/master/android/gradle/install.gradle'
+apply from: 'bintray_config.gradle'
 
-
-apply from: 'release-android-library.gradle'
-
-//apply plugin: 'com.github.dcendents.android-maven'
-
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
-
-
+// Upload library to Bintray:
+// ./gradlew clean bintrayUpload

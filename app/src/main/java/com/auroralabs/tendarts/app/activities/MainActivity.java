@@ -27,6 +27,7 @@ import com.auroralabs.tendarts.app.fragments.SetUserDialogFragment;
 import com.auroralabs.tendarts.domain.entities.LogEntity;
 import com.crashlytics.android.Crashlytics;
 import com.tendarts.sdk.TendartsSDK;
+import com.tendarts.sdk.client.TDKeysHandler;
 import com.tendarts.sdk.common.Configuration;
 import com.tendarts.sdk.common.ConstantsBase;
 
@@ -108,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
+
         // To get notified when a new location is available, you should register your listener
         TendartsSDK.registerGeoLocationReceiver(new TendartsSDK.IGeoLocationReceiver() {
             @Override
@@ -122,7 +125,43 @@ public class MainActivity extends AppCompatActivity {
         // Disable geolocation updates:
         //TendartsSDK.disableGeolocationUpdates();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
+        // Test association of key-value to device
+        TendartsSDK.associateKeyValueWithDevice(
+                this,
+                "testKey",
+                TDKeysHandler.KeyValueKind.STRING,
+                "testValue",
+                new TendartsSDK.IResponseObserver() {
+                    @Override
+                    public void onOk() {
+                        // An alert could be shown, but the event will be added to the list
+                    }
+
+                    @Override
+                    public void onFail(String reason) {
+                        // An alert could be shown, but the event will added to the list
+                    }
+                }
+        );
+
+        // Test association of key-value to user
+        TendartsSDK.associateKeyValueWithUser(
+                this,
+                "testKey",
+                TDKeysHandler.KeyValueKind.STRING,
+                "testValue",
+                new TendartsSDK.IResponseObserver() {
+                    @Override
+                    public void onOk() {
+                        // An alert could be shown, but the event will be added to the list
+                    }
+
+                    @Override
+                    public void onFail(String reason) {
+                        // An alert could be shown, but the event will be added to the list
+                    }
+                }
+        );
 
     }
 
@@ -190,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        String environment = String.format("Server base URL: %s", ConstantsBase.baseUrl);
+        String environment = String.format("Server base url: %s", ConstantsBase.BASE_URL);
         environmentText.setText(environment);
 
         String accessToken = Configuration.getAccessToken(this);

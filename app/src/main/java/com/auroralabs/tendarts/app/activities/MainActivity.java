@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.auroralabs.tendarts.R;
 import com.auroralabs.tendarts.app.adapters.LogAdapter;
 import com.auroralabs.tendarts.app.fragments.SetUserDialogFragment;
+import com.auroralabs.tendarts.app.receivers.ActionReceiver;
 import com.auroralabs.tendarts.domain.entities.LogEntity;
 import com.crashlytics.android.Crashlytics;
 import com.tendarts.sdk.TendartsSDK;
@@ -32,7 +33,9 @@ import com.tendarts.sdk.common.Configuration;
 import com.tendarts.sdk.common.ConstantsBase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -109,64 +112,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Test stack notifications
-//        TendartsSDK.instance().stackNotifications(true);
-//        TendartsSDK.instance().stackedNotificationTitle("10darts stack");
-//        TendartsSDK.instance().stackedNotificationContent("10darts stack content");
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
-
-        // To get notified when a new location is available, you should register your listener
-        TendartsSDK.registerGeoLocationReceiver(new TendartsSDK.IGeoLocationReceiver() {
-            @Override
-            public void onNewLocation(TendartsSDK.GeoLocation geoLocation) {
-                // New location available
-            }
-        });
-
-        // Enable geolocation updates (enabled by default)
-        //TendartsSDK.enableGeolocationUpdates();
-
-        // Disable geolocation updates:
-        //TendartsSDK.disableGeolocationUpdates();
-
-        // Test association of key-value to device
-        TendartsSDK.associateKeyValueWithDevice(
-                this,
-                "testKey",
-                TDKeysHandler.KeyValueKind.STRING,
-                "testValue",
-                new TendartsSDK.IResponseObserver() {
-                    @Override
-                    public void onOk() {
-                        // An alert could be shown, but the event will be added to the list
-                    }
-
-                    @Override
-                    public void onFail(String reason) {
-                        // An alert could be shown, but the event will added to the list
-                    }
-                }
-        );
-
-        // Test association of key-value to user
-        TendartsSDK.associateKeyValueWithUser(
-                this,
-                "testKey",
-                TDKeysHandler.KeyValueKind.STRING,
-                "testValue",
-                new TendartsSDK.IResponseObserver() {
-                    @Override
-                    public void onOk() {
-                        // An alert could be shown, but the event will be added to the list
-                    }
-
-                    @Override
-                    public void onFail(String reason) {
-                        // An alert could be shown, but the event will be added to the list
-                    }
-                }
-        );
+        configureTenDarts();
 
     }
 
@@ -289,6 +235,79 @@ public class MainActivity extends AppCompatActivity {
                 askForUserName();
             }
         });
+
+    }
+
+    /**
+     * Does multiple set ups to test the features that the TenDarts SDK offers
+     */
+    private void configureTenDarts() {
+
+        // Test stack notifications
+//        TendartsSDK.instance().stackNotifications(true);
+//        TendartsSDK.instance().stackedNotificationTitle("10darts stack");
+//        TendartsSDK.instance().stackedNotificationContent("10darts stack content");
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
+
+        // To get notified when a new location is available, you should register your listener
+        TendartsSDK.registerGeoLocationReceiver(new TendartsSDK.IGeoLocationReceiver() {
+            @Override
+            public void onNewLocation(TendartsSDK.GeoLocation geoLocation) {
+                // New location available
+            }
+        });
+
+        // Enable geolocation updates (enabled by default)
+        //TendartsSDK.enableGeolocationUpdates();
+
+        // Disable geolocation updates:
+        //TendartsSDK.disableGeolocationUpdates();
+
+        // Test association of key-value to device
+        TendartsSDK.associateKeyValueWithDevice(
+                this,
+                "testKey",
+                TDKeysHandler.KeyValueKind.STRING,
+                "testValue",
+                new TendartsSDK.IResponseObserver() {
+                    @Override
+                    public void onOk() {
+                        // An alert could be shown, but the event will be added to the list
+                    }
+
+                    @Override
+                    public void onFail(String reason) {
+                        // An alert could be shown, but the event will added to the list
+                    }
+                }
+        );
+
+        // Test association of key-value to user
+        TendartsSDK.associateKeyValueWithUser(
+                this,
+                "testKey",
+                TDKeysHandler.KeyValueKind.STRING,
+                "testValue",
+                new TendartsSDK.IResponseObserver() {
+                    @Override
+                    public void onOk() {
+                        // An alert could be shown, but the event will be added to the list
+                    }
+
+                    @Override
+                    public void onFail(String reason) {
+                        // An alert could be shown, but the event will be added to the list
+                    }
+                }
+        );
+
+        Map<String, String> replyActionsMap = new HashMap<>();
+        replyActionsMap.put("REPLY", ActionReceiver.ACTION_REPLY);
+        replyActionsMap.put("TEST", ActionReceiver.ACTION_TEST);
+        TendartsSDK.setReplyActions(this, replyActionsMap);
+
+        registerActionReceiver(this);
 
     }
 
@@ -430,4 +449,13 @@ public class MainActivity extends AppCompatActivity {
         return codeName+" v"+release+", API Level: "+Build.VERSION.SDK_INT;
     }
 
+    private static void registerActionReceiver(Context context) {
+
+        ActionReceiver actionReceiver = new ActionReceiver();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ActionReceiver.ACTION_REPLY);
+        filter.addAction(ActionReceiver.ACTION_TEST);
+        context.registerReceiver(actionReceiver, filter);
+    }
 }

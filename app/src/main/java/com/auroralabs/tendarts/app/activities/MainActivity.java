@@ -109,6 +109,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Test stack notifications
+//        TendartsSDK.instance().stackNotifications(true);
+//        TendartsSDK.instance().stackedNotificationTitle("10darts stack");
+//        TendartsSDK.instance().stackedNotificationContent("10darts stack content");
+
         LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
 
         // To get notified when a new location is available, you should register your listener

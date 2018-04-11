@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 public class ActionReceiver extends BroadcastReceiver {
 
@@ -18,15 +19,19 @@ public class ActionReceiver extends BroadcastReceiver {
 
         if (intent != null) {
 
-            String action = intent.getAction();
-
             Bundle extras = intent.getExtras();
             if (extras == null) {
                 Log.e(LOG_TAG, "onReceive: no extras");
                 return;
             }
 
-            // TODO: luisma: parse intent and do something
+            String intentAction = intent.getAction();
+            String actionId = extras.getString("action_id");
+            String actionCommand = extras.getString("action_command");
+
+            String message = "Notification action clicked: " + actionCommand;
+            Toast.makeText(context,message, Toast.LENGTH_SHORT).show();
+
         }
 
     }

@@ -244,9 +244,9 @@ public class MainActivity extends AppCompatActivity {
     private void configureTenDarts() {
 
         // Test stack notifications
-//        TendartsSDK.instance().stackNotifications(true);
-//        TendartsSDK.instance().stackedNotificationTitle("10darts stack");
-//        TendartsSDK.instance().stackedNotificationContent("10darts stack content");
+        //TendartsSDK.instance().stackNotifications(true);
+        //TendartsSDK.instance().stackedNotificationTitle("10darts stack");
+        //TendartsSDK.instance().stackedNotificationContent("10darts stack content");
 
         LocalBroadcastManager.getInstance(this).registerReceiver(logBroadcastReceiver, new IntentFilter(LOG_BROADCAST_INTENT_FILTER));
 

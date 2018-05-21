@@ -8,6 +8,7 @@ Sample project that integrates the [10Darts library](https://github.com/10darts/
 - [Build variants](#build-variants)
 - [Building considerations](#building-considerations)
 - [SDK integration steps](#sdk-integration-steps)
+- [Common problems](#common-problems)
 
 ## Requirements ##
 
@@ -63,5 +64,20 @@ However there is a section that is not entirely clear, it is necessary to create
 
 ![IMAGE](docs/img/dashboard_create_app.png)
 
+## Common problems ##
+
+If you have conflicts with Google Play Services version, you can exclude it from 10darts and add it manually with the version you need:
+
+```
+    implementation  ('com.10darts:sdk:1.26') {
+        exclude group: 'com.google.android.gms', module: 'play-services-location'
+        exclude group: 'com.google.android.gms', module: 'play-services-gcm'
+    }
+
+    implementation "com.google.android.gms:play-services-location:15.0.1"
+    implementation ("com.google.android.gms:play-services-gcm:15.0.1")
+```
+
+Keep in mind that at least, it should be the version that we define [here](https://github.com/10darts/android-TendartsSDK/blob/development/build.gradle) to prevent problems related with missing API methods.
 
 
